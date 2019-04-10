@@ -1,0 +1,9 @@
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+
+note over selain:
+Pyyntö sisältää JSON-muodossa olevan uuden muistiinpanon. Pyyntöön liitetty Header
+Content-Type kertoo palvelimelle pyynnön mukana tulevan datan olevan JSON muotoista. 
+Javascript-koodi hoitaa tapahtumankäsittelyn jossa uusi muistiinpanolista piirretään
+uudelleen lisättynä uudella muistiinpanolla ja uusi 
+muistiinpano lähetetään palvelimelle.
+end note
