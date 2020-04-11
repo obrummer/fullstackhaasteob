@@ -1,86 +1,87 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 
-const Display = props =>
-        <div>
-            <table>
-                <tbody>
-                <tr>
-                <td width='100' >{props.text}</td>
-                <td>{props.value}</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+const Button = props => (
+  <button onClick={props.handleClick}>{props.text}</button>
+);
 
-const Button = (props) =>
-    <button onClick={props.handleClick}>{props.text}</button>
+const StatisticLine = props => (
+  <tr>
+    <td>{props.text}</td>
+    <td>{props.value}</td>
+  </tr>
+);
 
-const Statistics = (props) => {
-    const getSum = () => {
-        return props.bad + props.good + props.neutral
+const NoResult = () => (
+  <div>
+    <p>No feedback given</p>
+  </div>
+);
+
+const Statistics = ({ good, neutral, bad }) => {
+  const countAverage = (good, neutral, bad) => {
+    const initialValue = 0;
+    const average = (good - bad) / (good + bad + neutral);
+
+    if (good === 0 && bad === 0 && neutral === 0) {
+      return initialValue;
+    } else {
+      return average;
     }
-    const getAverage = () => {
-        let total = props.bad + props.good + props.neutral
-        let goodClick = 1
-        let badClick = -1
-        let goodClickAmount = props.good * goodClick
-        let badClickAmount = props.bad * badClick
-        return (goodClickAmount + badClickAmount) / total
-    }
-    const getPositivePercentage = () => {
-        let total = props.bad + props.good + props.neutral
-        return props.good / total * 100 + ' %'
-    }
+  };
+  const countPositive = (good, neutral, bad) => {
+    const initialValue = 0;
+    const positivePercentage = (good / (good + bad + neutral)) * 100 + '%';
 
-    if (props.bad + props.good + props.neutral === 0) {
-        return (
-            <div>
-                <h1>Statistiikkaa</h1>
-                <p>Ei yhtään palautetta annettu</p>
-            </div>
-        )
+    if (good === 0 && bad === 0 && neutral === 0) {
+      return initialValue;
+    } else {
+      return positivePercentage;
     }
+  };
 
-    return (
-        <div>
-            <h1>Statistiikkaa</h1>
-            <Display text="hyvä " value={props.good} />
-            <Display text="neutraali" value={props.neutral} />
-            <Display text="huono" value={props.bad} />
-            <Display text="yhteensä" value={getSum()} />
-            <Display text="keskiarvo" value={getAverage()} />
-            <Display text="positiivisia" value={getPositivePercentage()} />
-        </div>
-    )
-}
+  return (
+    <div>
+      <h2>Statistics</h2>
+      <table>
+        <tbody>
+          <StatisticLine value={good} text="good" />
+          <StatisticLine value={neutral} text="neutral" />
+          <StatisticLine value={bad} text="bad" />
+          <StatisticLine value={good + bad + neutral} text="all" />
+          <StatisticLine
+            value={countAverage(good, neutral, bad)}
+            text="average"
+          />
+          <StatisticLine
+            value={countPositive(good, neutral, bad)}
+            text="positive"
+          />
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const App = () => {
-    const [good, setGood] = useState(0)
-    const [neutral, setNeutral] = useState(0)
-    const [bad, setBad] = useState(0)
+  // tallenna napit omaan tilaansa
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-    const setToGoodValue = (newValue) => {
-        setGood(newValue)
-    }
-    const setToNeutralValue = (newValue) => {
-        setNeutral(newValue)
-    }
-    const setToBadValue = (newValue) => {
-        setBad(newValue)
-    }
+  return (
+    <div>
+      <h2>Give feedback</h2>
+      <Button handleClick={() => setGood(good + 1)} text="good" />
+      <Button handleClick={() => setNeutral(neutral + 1)} text="neutral" />
+      <Button handleClick={() => setBad(bad + 1)} text="bad" />
+      {good + bad + neutral === 0 ? (
+        <NoResult />
+      ) : (
+        <Statistics good={good} neutral={neutral} bad={bad} />
+      )}
+    </div>
+  );
+};
 
-    return (
-        <div>
-            <h1>Anna palautetta</h1>
-            <Button handleClick={() => setToGoodValue(good + 1)} text='hyvä' />
-            <Button handleClick={() => setToNeutralValue(neutral + 1)} text='neutraali' />
-            <Button handleClick={() => setToBadValue(bad + 1)} text='huono' />
-            <Statistics good={good} neutral={neutral} bad={bad} />
-        </div>
-    )
-}
-
-ReactDOM.render(<App />,
-    document.getElementById('root')
-)
+ReactDOM.render(<App />, document.getElementById('root'));

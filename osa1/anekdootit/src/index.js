@@ -1,65 +1,49 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 
-const Display = props =>
-        <div>
-            {props.text} {props.points[props.id]}
-        </div>
+const Button = props => (
+  <button onClick={props.handleClick}>{props.text}</button>
+);
 
-const Score = props =>
-        <div>
-          <h1>Anecdote with most votes</h1>
-          <p>{props.value}</p>
-        </div>
+const App = props => {
+  const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState([0, 0, 0, 0, 0, 0]);
 
-const Button = (props) =>
-    <button onClick={props.handleClick}>{props.text}</button>
-
-const App = (props) => {
-  const [selected, setSelected] = useState(0)
-  const [id, setId] = useState(0)
-  const [points, setPoints] = useState([0,0,0,0,0,0])
-
-
-  const getNewAnecdote = () => {
-    let index = Math.floor((Math.random() * 6));
-    let randomAnecdote = props.anecdotes[index]
-    setSelected(randomAnecdote)
-    setId(index)
-  }
+  const setNextAnecdote = () => {
+    setSelected(Math.floor(Math.random() * 6));
+  };
 
   const giveVote = () => {
-    const newVote = [...points]
-    newVote[id]+=1
-    setPoints(newVote)
-    console.log(points)
-  }
+    let copy = [...points];
+    copy[selected] += 1;
 
-  const getHighest = () => {
-    let score = points.indexOf(Math.max(...points));
-    let show = props.anecdotes[score]
-    let highscore = points[score]
-    return `${show} Has ${highscore} votes`
-  }
-  
-  let index = Math.floor((Math.random() * 6));
-  let z = index + 1
-  
+    setPoints(copy);
+  };
+
+  const findHighestNumber = () => {
+    const maxNumber = Math.max(...points);
+    return maxNumber;
+  };
+
+  const findHighestIndex = () => {
+    const maxNumberIndex = points.indexOf(Math.max(...points));
+    return maxNumberIndex;
+  };
+
   return (
     <div>
-      <h1>
-        Anecdote of the day
-      </h1>
-      {props.anecdotes[id]}
+      <h2>Anecdote of the day</h2>
+      {props.anecdotes[selected]}
+      <p>has {points[selected]} votes</p>
       <br />
-      <Display text="Votes" points={points} id={id}/>
-      <br />
-      <Button handleClick={giveVote} text='vote'/>
-      <Button handleClick={getNewAnecdote} text='next anecdote' />
-      <Score value={getHighest()} />
+      <Button handleClick={giveVote} text="vote" />
+      <Button handleClick={setNextAnecdote} text="next anecdote" />
+      <h2>Anecdote with most votes</h2>
+      <p>has {findHighestNumber()} votes</p>
+      {props.anecdotes[findHighestIndex()]}
     </div>
-  )
-}
+  );
+};
 
 const anecdotes = [
   'If it hurts, do it more often',
@@ -68,9 +52,6 @@ const anecdotes = [
   'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
   'Premature optimization is the root of all evil.',
   'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-]
+];
 
-ReactDOM.render(
-  <App anecdotes={anecdotes}/>,
-  document.getElementById('root')
-)
+ReactDOM.render(<App anecdotes={anecdotes} />, document.getElementById('root'));
