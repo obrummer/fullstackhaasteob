@@ -49,12 +49,22 @@ const App = () => {
       changePerson(id, personObject, newName);
       messageSetter(newName, 'changed successfully!');
     } else if (!nameValidator(newName)) {
-      personService.create(personObject).then(response => {
-        messageSetter(newName, 'created succesfully!');
-        setPersons(persons.concat(response));
-        setNewName('');
-        setNewNumber('');
-      });
+      personService
+        .create(personObject)
+        .then(response => {
+          messageSetter(newName, 'created succesfully!');
+          setPersons(persons.concat(response));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch(error => {
+          console.log(error.response.data.error);
+          setError('true');
+          messageSetter(error.response.data.error);
+          setTimeout(() => {
+            setError(false);
+          }, 5000);
+        });
     } else {
       setNewName('');
       setNewNumber('');
@@ -85,13 +95,12 @@ const App = () => {
   const removePerson = id => {
     const deletedName = [persons.find(person => person.id === id)][0].name;
     if (window.confirm(`Do you really want to remove ${deletedName}?`)) {
-      personService.remove(id).then(
-        personService.getAll().then(response => {
-          messageSetter(deletedName, 'deleted!');
-          setPersons(response);
-          listFilter(filterValue, response);
-        })
-      );
+      const newList = persons.filter(person => person.id !== id);
+      personService
+        .remove(id)
+        .then(messageSetter(deletedName, 'deleted!'))
+        .then(setPersons(persons.filter(person => person.id !== id)))
+        .then(listFilter(filterValue, newList));
     }
   };
 
